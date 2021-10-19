@@ -23,7 +23,7 @@
 #include "clockcheck.h"
 #include "print.h"
 
-#define CHECK_MIN_INTERVAL 1000000000
+#define CHECK_MIN_INTERVAL 100000000
 #define CHECK_MAX_FREQ 900000000
 
 struct clockcheck {
@@ -98,10 +98,14 @@ int clockcheck_sample(struct clockcheck *cc, uint64_t ts)
 		if (min_foffset > cc->freq_limit) {
 			pr_warning("clockcheck: clock jumped forward or"
 					" running faster than expected!");
+			pr_warning("min_foffset=%f, max_offset=%f, cc->freq_limit=%d, interval=%ld", min_foffset, max_foffset, cc->freq_limit, interval);
+			system("mkdir -p /sys/kernel/debug/tracing/ ; echo 0 > /sys/kernel/debug/tracing/tracing_on");
 			ret = 1;
 		} else if (max_foffset < -cc->freq_limit) {
 			pr_warning("clockcheck: clock jumped backward or"
 					" running slower than expected!");
+			pr_warning("min_foffset=%f, max_offset=%f, cc->freq_limit=%d, interval=%ld", min_foffset, max_foffset, cc->freq_limit, interval);
+			system("mkdir -p /sys/kernel/debug/tracing/ ; echo 0 > /sys/kernel/debug/tracing/tracing_on");
 			ret = 1;
 		}
 	}
